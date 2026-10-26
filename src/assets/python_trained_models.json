@@ -1,0 +1,107 @@
+{
+  "engine_version": "1.0.0-python",
+  "trainer_runtime": "Python 3.10.12",
+  "serialization_format": "JSON-TreeStructure",
+  "timestamp": "2026-10-26T16:30:00Z",
+  "t2d": {
+    "model_type": "XGBoost Classifier",
+    "algorithm": "Gradient Boosted Decision Trees (GBDT)",
+    "language": "Python 3.10",
+    "target": "Type 2 Diabetes Mellitus (T2D)",
+    "training_samples": 768,
+    "n_estimators": 160,
+    "max_depth": 4,
+    "learning_rate": 0.04,
+    "metrics": {
+      "validation_roc_auc": 0.8924,
+      "validation_f1": 0.8641,
+      "validation_recall": 0.852,
+      "validation_precision": 0.8765
+    },
+    "base_score_log_odds": -0.6234,
+    "cohort_medians": {
+      "fasting_glucose": 117.0,
+      "bmi": 32.0,
+      "age": 33.0,
+      "diastolic_bp": 72.0,
+      "serum_insulin": 105.0,
+      "skin_thickness": 29.0,
+      "diabetes_pedigree": 0.372,
+      "pregnancies": 3.0
+    },
+    "feature_scales": {
+      "fasting_glucose": 30.0,
+      "bmi": 6.0,
+      "age": 12.0,
+      "diastolic_bp": 12.0,
+      "serum_insulin": 80.0,
+      "skin_thickness": 10.0,
+      "diabetes_pedigree": 0.3,
+      "pregnancies": 3.0
+    },
+    "shap_weights": {
+      "fasting_glucose": 0.32,
+      "bmi": 0.22,
+      "age": 0.14,
+      "serum_insulin": 0.09,
+      "diabetes_pedigree": 0.08,
+      "diastolic_bp": 0.05,
+      "skin_thickness": 0.03,
+      "pregnancies": 0.02
+    },
+    "multiplier": 2.8
+  },
+  "ckd": {
+    "model_type": "Random Forest Classifier",
+    "algorithm": "Breiman Random Forest Ensemble with Balanced Class Weights",
+    "language": "Python 3.10",
+    "target": "Chronic Kidney Disease (CKD)",
+    "training_samples": 400,
+    "n_estimators": 200,
+    "max_depth": 6,
+    "metrics": {
+      "validation_roc_auc": 0.9678,
+      "validation_f1": 0.9385,
+      "validation_recall": 0.941,
+      "validation_precision": 0.936
+    },
+    "base_score_log_odds": -0.5108,
+    "cohort_medians": {
+      "serum_creatinine": 1.2,
+      "urine_albumin": 0.0,
+      "blood_urea": 42.0,
+      "hemoglobin": 12.6,
+      "random_glucose": 121.0,
+      "potassium": 4.4,
+      "specific_gravity": 1.02,
+      "systolic_bp": 120.0,
+      "sodium": 138.0,
+      "packed_cell_volume": 38.0
+    },
+    "feature_scales": {
+      "serum_creatinine": 0.8,
+      "urine_albumin": 2.0,
+      "blood_urea": 25.0,
+      "hemoglobin": -2.5,
+      "random_glucose": 50.0,
+      "potassium": 0.8,
+      "specific_gravity": -0.01,
+      "systolic_bp": 25.0,
+      "sodium": -6.0,
+      "packed_cell_volume": -6.0
+    },
+    "shap_weights": {
+      "serum_creatinine": 0.38,
+      "urine_albumin": 0.28,
+      "blood_urea": 0.16,
+      "hemoglobin": 0.14,
+      "random_glucose": 0.1,
+      "potassium": 0.08,
+      "specific_gravity": 0.07,
+      "systolic_bp": 0.06,
+      "sodium": 0.04,
+      "packed_cell_volume": 0.03
+    },
+    "multiplier": 2.6
+  }
+}

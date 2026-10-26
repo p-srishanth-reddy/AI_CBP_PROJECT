@@ -1,0 +1,6 @@
+{
+  "name": "RenalGlyco AI",
+  "description": "Dual-disease clinical decision support platform predicting Type 2 Diabetes and Chronic Kidney Disease risk with explainable AI (SHAP).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

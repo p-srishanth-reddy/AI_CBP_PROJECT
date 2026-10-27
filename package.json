@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "python3 backend/app/main.py & vite --port=3000 --host=0.0.0.0",
+    "dev": "vite --port=3000 --host=0.0.0.0",
     "start": "python3 backend/app/main.py & vite preview --port=3000 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview",

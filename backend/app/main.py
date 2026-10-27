@@ -17,28 +17,42 @@ import uuid
 import time
 from datetime import datetime
 from typing import Dict, Any, List, Optional
+try:
+    from fastapi import FastAPI, HTTPException, status
+    from fastapi.middleware.cors import CORSMiddleware
+    from pydantic import BaseModel, Field
+    import uvicorn
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
 
-from fastapi import FastAPI, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+if not HAS_FASTAPI:
+    # Delegate seamlessly to resilient standard-library Python backend
+    import sys
+    from server import start_server
+    if __name__ == "__main__":
+        port = int(os.environ.get("PYTHON_PORT", os.environ.get("BACKEND_PORT", 8001)))
+        start_server(port)
+        sys.exit(0)
 
 # Initialize FastAPI application
-app = FastAPI(
-    title="RenalGlyco AI Backend API",
-    description="Python FastAPI backend serving dual-disease risk evaluation and TreeSHAP explainability for T2D and CKD.",
-    version="2.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
+if HAS_FASTAPI:
+    app = FastAPI(
+        title="RenalGlyco AI Backend API",
+        description="Python FastAPI backend serving dual-disease risk evaluation and TreeSHAP explainability for T2D and CKD.",
+        version="2.0.0",
+        docs_url="/docs",
+        redoc_url="/redoc"
+    )
 
-# Enable CORS for React frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    # Enable CORS for React frontend
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Load Python-trained model parameters
 MODEL_ARTIFACT_PATH = os.path.join(os.path.dirname(__file__), "artifacts", "python_trained_models.json")

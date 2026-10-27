@@ -24,7 +24,7 @@ export const ClinicalReportModal = ({
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-slate-700" />
             <span className="text-sm font-semibold text-slate-900">
-              Clinical Decision Support Summary (Python Engine)
+              Clinical Decision Support Summary
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -55,7 +55,7 @@ export const ClinicalReportModal = ({
                 RenalGlyco AI Clinical Consultation Report
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Dual Cardiorenal Metabolic & Nephropathic Risk Assessment System (FastAPI Backend)
+                Dual Cardiorenal Metabolic & Nephropathic Risk Assessment Platform
               </p>
             </div>
             <div className="text-right font-mono text-[11px] text-slate-500">
@@ -92,7 +92,7 @@ export const ClinicalReportModal = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 border border-slate-200 rounded-xl">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Metabolic Surveillance (Python XGBoost)
+                Metabolic Risk Evaluation
               </span>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-lg font-bold text-slate-900">Type 2 Diabetes Risk</span>
@@ -107,7 +107,7 @@ export const ClinicalReportModal = ({
 
             <div className="p-4 border border-slate-200 rounded-xl">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Renal Filtration Surveillance (Python Random Forest)
+                Renal Filtration Risk Evaluation
               </span>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-lg font-bold text-slate-900">Chronic Kidney Disease</span>
@@ -121,10 +121,10 @@ export const ClinicalReportModal = ({
             </div>
           </div>
 
-          {/* Explainable AI Audit Summary */}
+          {/* Explainable Factor Audit Summary */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-2">
-              Explainable AI (Python TreeSHAP) Primary Biological Drivers
+              Biomarker Attribution & Primary Influencing Factors
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">

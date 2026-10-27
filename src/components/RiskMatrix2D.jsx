@@ -44,7 +44,7 @@ export const RiskMatrix2D = ({ prediction }) => {
               Cardiorenal Metabolic-Renal Risk Matrix
             </h3>
             <p className="text-sm text-slate-500">
-              Cross-disciplinary risk mapping of glycemic vs. renal burden (Python Evaluated)
+              Cross-disciplinary risk mapping of glycemic vs. renal burden
             </p>
           </div>
         </div>

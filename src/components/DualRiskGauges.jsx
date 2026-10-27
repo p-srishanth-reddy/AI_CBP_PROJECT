@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Zap } from 'lucide-react';
+import { ShieldAlert, Zap, Award, CheckCircle2 } from 'lucide-react';
 
 export const DualRiskGauges = ({ prediction }) => {
   if (!prediction || !prediction.predictions) return null;
@@ -81,15 +81,15 @@ export const DualRiskGauges = ({ prediction }) => {
               {percentage}
               <span className="text-xl text-slate-500 font-normal">%</span>
             </span>
-            <span className="text-xs font-mono text-slate-500 uppercase tracking-wider font-semibold">
-              Python Calculated Risk
+            <span className="text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              Assessed Risk Score
             </span>
           </div>
         </div>
 
         {/* Population Baseline Offset Reference */}
         <div className="w-full mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-600">
-          <span>Population Base Rate $E[f(x)]$</span>
+          <span>Population Reference Baseline</span>
           <span className="font-mono text-slate-900 font-bold">
             {Math.round((baseValue || 0.35) * 100)}%
           </span>
@@ -108,7 +108,7 @@ export const DualRiskGauges = ({ prediction }) => {
           diabetes.riskCategory,
           diabetes.baseValue,
           <Zap className="w-5 h-5 text-amber-500" />,
-          'Python XGBoost Pipeline'
+          'Glycemic Impairment Profile'
         )}
 
         {renderGauge(
@@ -117,7 +117,7 @@ export const DualRiskGauges = ({ prediction }) => {
           chronicKidneyDisease.riskCategory,
           chronicKidneyDisease.baseValue,
           <ShieldAlert className="w-5 h-5 text-cyan-600" />,
-          'Python Random Forest Model'
+          'Nephropathic Risk Profile'
         )}
       </div>
 
@@ -140,21 +140,18 @@ export const DualRiskGauges = ({ prediction }) => {
             {prediction.glycemicStatus}
           </span>
           <div className="text-xs text-slate-500 mt-0.5">
-            Python surrogate threshold
+            Clinical Diagnostic Criteria
           </div>
         </div>
 
         <div>
-          <span className="text-slate-500 font-medium block text-xs">Python Backend Audit</span>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="font-mono text-xs font-bold text-slate-800">
-              TreeSHAP: {prediction.executionTimeMs} ms
-            </span>
-            <span className="text-slate-300">·</span>
-            <span className="text-emerald-700 font-bold text-xs">FastAPI 200 OK</span>
+          <span className="text-slate-500 font-medium block text-xs">Assessment Verification</span>
+          <div className="flex items-center gap-1.5 mt-0.5 text-xs text-emerald-800 font-bold">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Guideline Calibrated</span>
           </div>
-          <div className="text-xs text-slate-400 font-mono mt-0.5 truncate">
-            ID: {prediction.assessmentId ? prediction.assessmentId.substring(0, 16) : 'py-asm'}...
+          <div className="text-xs text-slate-500 mt-0.5 truncate font-mono">
+            ID: {prediction.assessmentId ? prediction.assessmentId.substring(0, 16) : 'ASM-RECORD'}
           </div>
         </div>
       </div>

@@ -7,8 +7,28 @@
 
 const API_BASE = '/api/v1';
 
+async function fetchWithRetry(url, options = {}, retries = 4, delay = 500) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) {
+        return await response.json();
+      }
+      if (attempt === retries) {
+        throw new Error('Unable to complete clinical risk calculation. Please verify entered values and retry.');
+      }
+    } catch (err) {
+      if (attempt === retries) {
+        throw err;
+      }
+      // Wait for Python server startup
+      await new Promise((res) => setTimeout(res, delay * attempt));
+    }
+  }
+}
+
 export async function predictMultiRisk(patientRecord) {
-  const response = await fetch(`${API_BASE}/predict/multi-risk`, {
+  return await fetchWithRetry(`${API_BASE}/predict/multi-risk`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,19 +36,11 @@ export async function predictMultiRisk(patientRecord) {
     },
     body: JSON.stringify(patientRecord),
   });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Python backend error (${response.status}): ${errorText}`);
-  }
-
-  return await response.json();
 }
 
 export async function checkBackendHealth() {
-  const response = await fetch(`${API_BASE}/health`);
-  if (!response.ok) {
-    throw new Error(`Backend health check failed: ${response.status}`);
-  }
-  return await response.json();
+  return await fetchWithRetry(`${API_BASE}/health`, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' },
+  }, 2, 300);
 }

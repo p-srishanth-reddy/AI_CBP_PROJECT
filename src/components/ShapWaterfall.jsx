@@ -31,11 +31,11 @@ export const ShapWaterfall = ({ prediction }) => {
           <div className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cyan-600" />
             <h3 className="text-base font-bold text-slate-900">
-              Explainable AI (Python TreeSHAP) Attribution
+              Biomarker Influence & Factor Attribution
             </h3>
           </div>
           <p className="text-sm text-slate-500 mt-0.5">
-            Local Shapley contributions computed by Python FastAPI backend
+            Individual biomarker contributions driving or mitigating patient risk relative to population baseline
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export const ShapWaterfall = ({ prediction }) => {
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            T2D Predictors
+            Metabolic Factors (T2D)
           </button>
           <button
             type="button"
@@ -61,25 +61,25 @@ export const ShapWaterfall = ({ prediction }) => {
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            CKD Predictors
+            Renal Factors (CKD)
           </button>
         </div>
       </div>
 
-      {/* Mathematical Principle & Baseline Banner */}
+      {/* Clinical Factor Attribution & Baseline Banner */}
       <div className="my-4 p-3.5 bg-slate-50 rounded-xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs sm:text-sm">
         <div className="flex items-center gap-2 text-slate-700">
           <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
           <span>
-            Model Output:{' '}
+            Assessed Risk Score:{' '}
             <strong className="font-mono text-slate-900 font-bold">
               {Math.round((diseaseData.riskProbability || 0) * 100)}%
             </strong>{' '}
-            (Cohort Baseline $E[f(x)]$: {Math.round((diseaseData.baseValue || 0.35) * 100)}%)
+            (Population Reference Baseline: {Math.round((diseaseData.baseValue || 0.35) * 100)}%)
           </span>
         </div>
-        <div className="text-xs font-mono text-slate-500 font-semibold">
-          Python SHAP: $f(x) = E[f(x)] + \sum \phi_i$
+        <div className="text-xs text-slate-500 font-semibold">
+          Attribution: Baseline + Net Biomarker Effects
         </div>
       </div>
 
@@ -111,7 +111,7 @@ export const ShapWaterfall = ({ prediction }) => {
 
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-slate-400 hidden sm:inline">
-                    Ref: {driver.normalRange}
+                    Reference: {driver.normalRange}
                   </span>
                   <span
                     className={`font-mono font-bold text-sm ${
@@ -141,17 +141,17 @@ export const ShapWaterfall = ({ prediction }) => {
       <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-start gap-2.5 text-xs sm:text-sm text-slate-700 leading-relaxed">
         <CheckCircle2 className="w-5 h-5 text-cyan-600 shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold text-slate-900">Clinician Audit Takeaway: </span>
+          <span className="font-bold text-slate-900">Clinical Factor Summary: </span>
           {diseaseData.topRiskDrivers && diseaseData.topRiskDrivers.length > 0 ? (
             <span>
-              Primary risk escalation is dominated by{' '}
-              <strong>{diseaseData.topRiskDrivers[0]?.clinicalName}</strong> (impact +
+              Primary risk elevation is driven by{' '}
+              <strong>{diseaseData.topRiskDrivers[0]?.clinicalName}</strong> (relative impact +
               {diseaseData.topRiskDrivers[0]?.shapImpact.toFixed(2)}) and{' '}
-              <strong>{diseaseData.topRiskDrivers[1]?.clinicalName}</strong> (impact +
-              {diseaseData.topRiskDrivers[1]?.shapImpact.toFixed(2)}). Therapeutic intervention should prioritize these markers.
+              <strong>{diseaseData.topRiskDrivers[1]?.clinicalName}</strong> (relative impact +
+              {diseaseData.topRiskDrivers[1]?.shapImpact.toFixed(2)}). Clinical management should prioritize stabilization of these target markers.
             </span>
           ) : (
-            <span>Biomarkers exert neutral or protective influence against population baselines.</span>
+            <span>Patient biomarkers exert favorable protective or neutral influences relative to reference ranges.</span>
           )}
         </div>
       </div>

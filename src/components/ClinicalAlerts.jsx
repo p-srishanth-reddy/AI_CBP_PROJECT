@@ -9,7 +9,7 @@ export const ClinicalAlerts = ({ alerts = [] }) => {
         <h3 className="text-base font-bold text-slate-900">
           Clinical Guidance & Evidence-Based Alerts
         </h3>
-        <span className="text-xs text-slate-500 font-medium">· KDIGO 2024 / ADA 2024 (Python Generated)</span>
+        <span className="text-xs text-slate-500 font-medium">· KDIGO 2024 & ADA Standards of Care</span>
       </div>
 
       <div className="space-y-3">

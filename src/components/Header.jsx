@@ -1,10 +1,9 @@
 import React from 'react';
-import { Activity, FileText, Code2, RefreshCw, Terminal } from 'lucide-react';
+import { Activity, FileText, RefreshCw, BookOpen, Layers } from 'lucide-react';
 
 export const Header = ({
   activeTab,
   setActiveTab,
-  onOpenApiModal,
   onOpenReportModal,
   onReset,
 }) => {
@@ -38,7 +37,7 @@ export const Header = ({
                   : 'hover:text-slate-900'
               }`}
             >
-              Diagnostic Intake & XAI
+              Patient Risk Assessment
             </button>
             <button
               type="button"
@@ -49,7 +48,7 @@ export const Header = ({
                   : 'hover:text-slate-900'
               }`}
             >
-              Cardiorenal 2D Matrix
+              Cardiorenal Risk Matrix
             </button>
             <button
               type="button"
@@ -64,30 +63,20 @@ export const Header = ({
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('python_hub')}
+              onClick={() => setActiveTab('guidelines')}
               className={`flex items-center gap-1.5 whitespace-nowrap transition-colors cursor-pointer py-1.5 ${
-                activeTab === 'python_hub'
+                activeTab === 'guidelines'
                   ? 'text-cyan-700 font-bold border-b-2 border-cyan-600'
                   : 'hover:text-slate-900 text-slate-600'
               }`}
             >
-              <Terminal className="w-4 h-4 text-cyan-600" />
-              <span>Python & FastAPI</span>
+              <BookOpen className="w-4 h-4 text-cyan-600" />
+              <span>Practice Guidelines</span>
             </button>
           </nav>
 
           {/* Zone 3: Actions */}
           <div className="flex items-center gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={onOpenApiModal}
-              className="flex items-center gap-2 px-3.5 py-2 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors whitespace-nowrap cursor-pointer"
-              title="Inspect OpenAPI Schema and live JSON payload"
-            >
-              <Code2 className="w-4 h-4 text-slate-600" />
-              <span className="hidden sm:inline">REST API</span>
-            </button>
-
             <button
               type="button"
               onClick={onOpenReportModal}

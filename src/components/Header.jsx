@@ -1,15 +1,7 @@
 import React from 'react';
 import { Activity, FileText, Code2, RefreshCw, Terminal } from 'lucide-react';
 
-interface HeaderProps {
-  activeTab: 'intake' | 'matrix' | 'trajectory' | 'python_hub';
-  setActiveTab: (tab: 'intake' | 'matrix' | 'trajectory' | 'python_hub') => void;
-  onOpenApiModal: () => void;
-  onOpenReportModal: () => void;
-  onReset: () => void;
-}
-
-export const Header: React.FC<HeaderProps> = ({
+export const Header = ({
   activeTab,
   setActiveTab,
   onOpenApiModal,
@@ -19,9 +11,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Strict 3-zone top bar contract with enhanced readability */}
         <div className="flex items-center justify-between gap-8 h-18">
-          {/* Zone 1: Single text element wordmark */}
+          {/* Zone 1: Brand wordmark */}
           <div className="flex items-center gap-3.5 shrink-0">
             <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xs">
               <Activity className="w-6 h-6 text-cyan-400" />
@@ -36,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Zone 2: Single-line navigation links with increased font size */}
+          {/* Zone 2: Navigation Links */}
           <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-600">
             <button
               type="button"
@@ -85,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </nav>
 
-          {/* Zone 3: Actions with comfortable sizing */}
+          {/* Zone 3: Actions */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"

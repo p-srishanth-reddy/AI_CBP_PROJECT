@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import { HistoricalVisit } from '../types/clinical';
 import { History, Calendar } from 'lucide-react';
 
-interface LongitudinalTrendsProps {
-  history: HistoricalVisit[];
-  mrn: string;
-}
-
-export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history, mrn }) => {
-  const [selectedMetric, setSelectedMetric] = useState<'risk' | 'egfr' | 'glucose' | 'creatinine'>('risk');
+export const LongitudinalTrends = ({ history = [], mrn = 'MRN-RECORD' }) => {
+  const [selectedMetric, setSelectedMetric] = useState('risk');
 
   const width = 600;
   const height = 210;
@@ -18,22 +12,22 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
   const innerH = height - paddingY * 2;
 
   const points = history.map((h, i) => {
-    const x = paddingX + (i / (history.length - 1)) * innerW;
+    const x = paddingX + (i / Math.max(history.length - 1, 1)) * innerW;
     return { ...h, x };
   });
 
-  let renderSeries: { label: string; stroke: string; dataPoints: { x: number; y: number; val: number }[] }[] = [];
+  let renderSeries = [];
 
   if (selectedMetric === 'risk') {
     const t2dPts = points.map((p) => ({
       x: p.x,
-      y: height - paddingY - p.t2dRisk * innerH,
-      val: Math.round(p.t2dRisk * 100),
+      y: height - paddingY - (p.t2dRisk || 0) * innerH,
+      val: Math.round((p.t2dRisk || 0) * 100),
     }));
     const ckdPts = points.map((p) => ({
       x: p.x,
-      y: height - paddingY - p.ckdRisk * innerH,
-      val: Math.round(p.ckdRisk * 100),
+      y: height - paddingY - (p.ckdRisk || 0) * innerH,
+      val: Math.round((p.ckdRisk || 0) * 100),
     }));
     renderSeries = [
       { label: 'T2D Risk (%)', stroke: '#F59E0B', dataPoints: t2dPts },
@@ -44,7 +38,7 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
     const minVal = 10;
     const egfrPts = points.map((p) => ({
       x: p.x,
-      y: height - paddingY - ((p.eGfr - minVal) / (maxVal - minVal)) * innerH,
+      y: height - paddingY - (((p.eGfr || 90) - minVal) / (maxVal - minVal)) * innerH,
       val: p.eGfr,
     }));
     renderSeries = [{ label: 'eGFR (mL/min/1.73m²)', stroke: '#10B981', dataPoints: egfrPts }];
@@ -53,7 +47,7 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
     const minVal = 70;
     const gPts = points.map((p) => ({
       x: p.x,
-      y: height - paddingY - ((p.fastingGlucose - minVal) / (maxVal - minVal)) * innerH,
+      y: height - paddingY - (((p.fastingGlucose || 100) - minVal) / (maxVal - minVal)) * innerH,
       val: p.fastingGlucose,
     }));
     renderSeries = [{ label: 'Fasting Glucose (mg/dL)', stroke: '#E11D48', dataPoints: gPts }];
@@ -62,7 +56,7 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
     const minVal = 0.5;
     const crPts = points.map((p) => ({
       x: p.x,
-      y: height - paddingY - ((p.serumCreatinine - minVal) / (maxVal - minVal)) * innerH,
+      y: height - paddingY - (((p.serumCreatinine || 1.0) - minVal) / (maxVal - minVal)) * innerH,
       val: p.serumCreatinine,
     }));
     renderSeries = [{ label: 'Serum Creatinine (mg/dL)', stroke: '#6366F1', dataPoints: crPts }];
@@ -206,7 +200,7 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
           ))}
         </div>
 
-        {/* Tabular Records with increased font size */}
+        {/* Tabular Records */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm font-mono">
             <thead>
@@ -227,10 +221,10 @@ export const LongitudinalTrends: React.FC<LongitudinalTrendsProps> = ({ history,
                     {row.visitDate}
                   </td>
                   <td className="py-2.5 px-4">{row.fastingGlucose}</td>
-                  <td className="py-2.5 px-4">{row.serumCreatinine.toFixed(2)}</td>
+                  <td className="py-2.5 px-4">{Number(row.serumCreatinine).toFixed(2)}</td>
                   <td className="py-2.5 px-4">{row.eGfr}</td>
-                  <td className="py-2.5 px-4 text-amber-600 font-bold">{Math.round(row.t2dRisk * 100)}%</td>
-                  <td className="py-2.5 pl-4 text-cyan-600 font-bold">{Math.round(row.ckdRisk * 100)}%</td>
+                  <td className="py-2.5 px-4 text-amber-600 font-bold">{Math.round((row.t2dRisk || 0) * 100)}%</td>
+                  <td className="py-2.5 pl-4 text-cyan-600 font-bold">{Math.round((row.ckdRisk || 0) * 100)}%</td>
                 </tr>
               ))}
             </tbody>

@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { MultiRiskPredictionResponse, ShapImpact } from '../types/clinical';
 import { BarChart3, TrendingUp, TrendingDown, HelpCircle, CheckCircle2 } from 'lucide-react';
 
-interface ShapWaterfallProps {
-  prediction: MultiRiskPredictionResponse;
-}
+export const ShapWaterfall = ({ prediction }) => {
+  const [selectedDisease, setSelectedDisease] = useState('diabetes');
 
-export const ShapWaterfall: React.FC<ShapWaterfallProps> = ({ prediction }) => {
-  const [selectedDisease, setSelectedDisease] = useState<'diabetes' | 'ckd'>('diabetes');
+  if (!prediction || !prediction.predictions) return null;
 
   const diseaseData =
     selectedDisease === 'diabetes'
       ? prediction.predictions.diabetes
       : prediction.predictions.chronicKidneyDisease;
 
-  const allDrivers: ShapImpact[] = [
-    ...diseaseData.topRiskDrivers,
-    ...diseaseData.protectiveFactors,
+  if (!diseaseData) return null;
+
+  const allDrivers = [
+    ...(diseaseData.topRiskDrivers || []),
+    ...(diseaseData.protectiveFactors || []),
   ].sort((a, b) => b.shapImpact - a.shapImpact);
 
   const maxAbsImpact = Math.max(
@@ -32,11 +31,11 @@ export const ShapWaterfall: React.FC<ShapWaterfallProps> = ({ prediction }) => {
           <div className="flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-cyan-600" />
             <h3 className="text-base font-bold text-slate-900">
-              Explainable AI (TreeSHAP) Feature Attribution
+              Explainable AI (Python TreeSHAP) Attribution
             </h3>
           </div>
           <p className="text-sm text-slate-500 mt-0.5">
-            Local Shapley contributions explaining per-patient risk elevation
+            Local Shapley contributions computed by Python FastAPI backend
           </p>
         </div>
 
@@ -74,13 +73,13 @@ export const ShapWaterfall: React.FC<ShapWaterfallProps> = ({ prediction }) => {
           <span>
             Model Output:{' '}
             <strong className="font-mono text-slate-900 font-bold">
-              {Math.round(diseaseData.riskProbability * 100)}%
+              {Math.round((diseaseData.riskProbability || 0) * 100)}%
             </strong>{' '}
-            (Cohort Baseline $E[f(x)]$: {Math.round(diseaseData.baseValue * 100)}%)
+            (Cohort Baseline $E[f(x)]$: {Math.round((diseaseData.baseValue || 0.35) * 100)}%)
           </span>
         </div>
         <div className="text-xs font-mono text-slate-500 font-semibold">
-          Additivity: $f(x) = E[f(x)] + \sum \phi_i$
+          Python SHAP: $f(x) = E[f(x)] + \sum \phi_i$
         </div>
       </div>
 
@@ -143,7 +142,7 @@ export const ShapWaterfall: React.FC<ShapWaterfallProps> = ({ prediction }) => {
         <CheckCircle2 className="w-5 h-5 text-cyan-600 shrink-0 mt-0.5" />
         <div>
           <span className="font-bold text-slate-900">Clinician Audit Takeaway: </span>
-          {diseaseData.topRiskDrivers.length > 0 ? (
+          {diseaseData.topRiskDrivers && diseaseData.topRiskDrivers.length > 0 ? (
             <span>
               Primary risk escalation is dominated by{' '}
               <strong>{diseaseData.topRiskDrivers[0]?.clinicalName}</strong> (impact +

@@ -1,14 +1,11 @@
 import React from 'react';
-import { MultiRiskPredictionResponse } from '../types/clinical';
 import { Grid, Crosshair, AlertCircle } from 'lucide-react';
 
-interface RiskMatrix2DProps {
-  prediction: MultiRiskPredictionResponse;
-}
+export const RiskMatrix2D = ({ prediction }) => {
+  if (!prediction || !prediction.predictions) return null;
 
-export const RiskMatrix2D: React.FC<RiskMatrix2DProps> = ({ prediction }) => {
-  const xRisk = prediction.predictions.diabetes.riskProbability;
-  const yRisk = prediction.predictions.chronicKidneyDisease.riskProbability;
+  const xRisk = prediction.predictions.diabetes?.riskProbability || 0;
+  const yRisk = prediction.predictions.chronicKidneyDisease?.riskProbability || 0;
 
   const isHighT2d = xRisk >= 0.50;
   const isHighCkd = yRisk >= 0.50;
@@ -47,7 +44,7 @@ export const RiskMatrix2D: React.FC<RiskMatrix2DProps> = ({ prediction }) => {
               Cardiorenal Metabolic-Renal Risk Matrix
             </h3>
             <p className="text-sm text-slate-500">
-              Cross-disciplinary risk mapping of glycemic vs. renal burden
+              Cross-disciplinary risk mapping of glycemic vs. renal burden (Python Evaluated)
             </p>
           </div>
         </div>
@@ -123,7 +120,7 @@ export const RiskMatrix2D: React.FC<RiskMatrix2DProps> = ({ prediction }) => {
                 strokeDasharray="4 3"
               />
 
-              {/* Axes Labels with increased font */}
+              {/* Axes Labels */}
               <text
                 x={size / 2}
                 y={size - 12}

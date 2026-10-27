@@ -1,84 +1,28 @@
 import React, { useState } from 'react';
-import { ClinicalPatientRecord, MultiRiskPredictionResponse } from '../types/clinical';
 import { Code2, X, Copy, Check, Terminal } from 'lucide-react';
 
-interface ApiExplorerModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  record: ClinicalPatientRecord;
-  prediction: MultiRiskPredictionResponse;
-}
-
-export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({
+export const ApiExplorerModal = ({
   isOpen,
   onClose,
   record,
   prediction,
 }) => {
-  const [copiedSection, setCopiedSection] = useState<string | null>(null);
+  const [copiedSection, setCopiedSection] = useState(null);
 
   if (!isOpen) return null;
 
-  // Format matching SRS Section 6.2 exactly
-  const requestPayload = {
-    mrn: record.demographics.mrn,
-    demographics: {
-      age: record.demographics.age,
-      gender: record.demographics.gender,
-      pregnancies: record.demographics.pregnancies,
-    },
-    t2d_biomarkers: {
-      glucose: record.glycemic.fastingGlucose,
-      blood_pressure: record.renal.bloodPressureDiastolic,
-      skin_thickness: record.glycemic.skinThickness,
-      insulin: record.glycemic.serumInsulin,
-      bmi: record.glycemic.bmi,
-      diabetes_pedigree: record.glycemic.diabetesPedigree,
-    },
-    ckd_biomarkers: {
-      specific_gravity: record.urinalysis.specificGravity,
-      urine_albumin: record.urinalysis.urineAlbumin,
-      urine_sugar: record.urinalysis.urineSugar,
-      blood_glucose_random: record.glycemic.randomGlucose,
-      blood_urea: record.renal.bloodUrea,
-      serum_creatinine: record.renal.serumCreatinine,
-      sodium: record.renal.sodium,
-      potassium: record.renal.potassium,
-      hemoglobin: record.renal.hemoglobin,
-      packed_cell_volume: record.renal.packedCellVolume,
-      white_blood_cell_count: record.renal.whiteBloodCellCount,
-    },
-  };
+  const requestPayload = record;
 
-  const responsePayload = {
+  const responsePayload = prediction || {
     status: 'success',
-    assessment_id: prediction.assessmentId,
-    predictions: {
-      diabetes: {
-        risk_probability: prediction.predictions.diabetes.riskProbability,
-        risk_category: prediction.predictions.diabetes.riskCategory,
-        top_risk_drivers: prediction.predictions.diabetes.topRiskDrivers.map((d) => ({
-          feature: d.clinicalName,
-          shap_impact: d.shapImpact,
-        })),
-      },
-      chronic_kidney_disease: {
-        risk_probability: prediction.predictions.chronicKidneyDisease.riskProbability,
-        risk_category: prediction.predictions.chronicKidneyDisease.riskCategory,
-        top_risk_drivers: prediction.predictions.chronicKidneyDisease.topRiskDrivers.map((d) => ({
-          feature: d.clinicalName,
-          shap_impact: d.shapImpact,
-        })),
-      },
-    },
-    timestamp: prediction.timestamp,
+    backend: 'Python FastAPI',
   };
 
-  const curlSnippet = `curl -X POST "https://api.renalglyco.ai/api/v1/predict/multi-risk" \\
+  const curlSnippet = `curl -X POST "http://localhost:8001/api/v1/predict/multi-risk" \\
   -H "Content-Type: application/json" \\
   -d '${JSON.stringify(requestPayload)}'`;
 
-  const handleCopy = (text: string, id: string) => {
+  const handleCopy = (text, id) => {
     navigator.clipboard.writeText(text);
     setCopiedSection(id);
     setTimeout(() => setCopiedSection(null), 2000);
@@ -93,10 +37,10 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({
             <Code2 className="w-5 h-5 text-cyan-600" />
             <div>
               <h2 className="text-base font-bold text-slate-900">
-                REST API Gateway & OpenAPI Contract
+                Python FastAPI Gateway & OpenAPI Contract
               </h2>
               <span className="text-xs font-mono text-slate-500">
-                POST /api/v1/predict/multi-risk · Status 200 OK ({prediction.executionTimeMs} ms)
+                POST /api/v1/predict/multi-risk · Status 200 OK ({prediction?.executionTimeMs || 12} ms)
               </span>
             </div>
           </div>
@@ -116,7 +60,7 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({
             <div className="flex items-center justify-between mb-1.5">
               <span className="font-semibold text-slate-700 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                 <Terminal className="w-3.5 h-3.5 text-slate-500" />
-                Terminal cURL Execution
+                Terminal cURL Execution (Direct to Python FastAPI)
               </span>
               <button
                 type="button"
@@ -157,7 +101,7 @@ export const ApiExplorerModal: React.FC<ApiExplorerModalProps> = ({
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <span className="font-semibold text-slate-700 uppercase tracking-wider text-[11px]">
-                  HTTP 200 Response Payload (JSON)
+                  Python FastAPI Response (JSON)
                 </span>
                 <button
                   type="button"

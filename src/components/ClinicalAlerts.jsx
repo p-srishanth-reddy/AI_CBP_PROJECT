@@ -1,11 +1,7 @@
 import React from 'react';
 import { ShieldAlert, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
-interface ClinicalAlertsProps {
-  alerts: string[];
-}
-
-export const ClinicalAlerts: React.FC<ClinicalAlertsProps> = ({ alerts }) => {
+export const ClinicalAlerts = ({ alerts = [] }) => {
   return (
     <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-6">
       <div className="flex items-center gap-2.5 pb-3.5 border-b border-slate-100 mb-3.5">
@@ -13,7 +9,7 @@ export const ClinicalAlerts: React.FC<ClinicalAlertsProps> = ({ alerts }) => {
         <h3 className="text-base font-bold text-slate-900">
           Clinical Guidance & Evidence-Based Alerts
         </h3>
-        <span className="text-xs text-slate-500 font-medium">· KDIGO 2024 / ADA 2024</span>
+        <span className="text-xs text-slate-500 font-medium">· KDIGO 2024 / ADA 2024 (Python Generated)</span>
       </div>
 
       <div className="space-y-3">

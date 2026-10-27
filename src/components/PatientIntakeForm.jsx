@@ -1,46 +1,35 @@
 import React from 'react';
-import { ClinicalPatientRecord, Gender } from '../types/clinical';
-import { CLINICAL_PRESETS } from '../data/patientPresets';
+import { CLINICAL_PRESETS } from '../data/patientPresets.js';
 import { Stethoscope, Sparkles } from 'lucide-react';
 
-interface PatientIntakeFormProps {
-  record: ClinicalPatientRecord;
-  onChange: (updated: ClinicalPatientRecord) => void;
-  onSelectPreset: (presetId: string) => void;
-  selectedPresetId: string;
-}
-
-export const PatientIntakeForm: React.FC<PatientIntakeFormProps> = ({
+export const PatientIntakeForm = ({
   record,
   onChange,
   onSelectPreset,
   selectedPresetId,
 }) => {
-  const updateDemographics = <K extends keyof ClinicalPatientRecord['demographics']>(
-    key: K,
-    val: ClinicalPatientRecord['demographics'][K]
-  ) => {
+  const updateDemographics = (key, val) => {
     onChange({
       ...record,
       demographics: { ...record.demographics, [key]: val },
     });
   };
 
-  const updateGlycemic = (key: keyof ClinicalPatientRecord['glycemic'], val: number) => {
+  const updateGlycemic = (key, val) => {
     onChange({
       ...record,
       glycemic: { ...record.glycemic, [key]: val },
     });
   };
 
-  const updateRenal = (key: keyof ClinicalPatientRecord['renal'], val: number) => {
+  const updateRenal = (key, val) => {
     onChange({
       ...record,
       renal: { ...record.renal, [key]: val },
     });
   };
 
-  const updateUrinalysis = (key: keyof ClinicalPatientRecord['urinalysis'], val: number) => {
+  const updateUrinalysis = (key, val) => {
     onChange({
       ...record,
       urinalysis: { ...record.urinalysis, [key]: val },
@@ -128,7 +117,7 @@ export const PatientIntakeForm: React.FC<PatientIntakeFormProps> = ({
             </label>
             <select
               value={record.demographics.gender}
-              onChange={(e) => updateDemographics('gender', e.target.value as Gender)}
+              onChange={(e) => updateDemographics('gender', e.target.value)}
               className="w-full px-3 py-2 text-sm font-medium border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
             >
               <option value="female">Female</option>
@@ -315,7 +304,7 @@ export const PatientIntakeForm: React.FC<PatientIntakeFormProps> = ({
                 Serum Creatinine
               </label>
               <span className="text-sm font-mono font-bold text-slate-900">
-                {record.renal.serumCreatinine.toFixed(2)}{' '}
+                {Number(record.renal.serumCreatinine).toFixed(2)}{' '}
                 <span className="text-xs text-slate-500 font-normal">mg/dL</span>
               </span>
             </div>

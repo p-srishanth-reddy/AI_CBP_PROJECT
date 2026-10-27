@@ -1,19 +1,14 @@
 import React, { useState } from 'react';
 import { Play, Terminal, CheckCircle2, Server, Cpu, Database, FileCode, Copy, Check } from 'lucide-react';
-import { ClinicalPatientRecord, MultiRiskPredictionResponse } from '../types/clinical';
 
-interface PythonFastApiHubProps {
-  record: ClinicalPatientRecord;
-  prediction: MultiRiskPredictionResponse;
-}
-
-export const PythonFastApiHub: React.FC<PythonFastApiHubProps> = ({ record, prediction }) => {
-  const [activeCodeTab, setActiveCodeTab] = useState<'train_t2d' | 'train_ckd' | 'fastapi_main' | 'schemas'>('train_t2d');
+export const PythonFastApiHub = ({ record, prediction }) => {
+  const [activeCodeTab, setActiveCodeTab] = useState('fastapi_main');
   const [isTrainingRunning, setIsTrainingRunning] = useState(false);
-  const [trainingLogs, setTrainingLogs] = useState<string[]>([
-    'Python 3.11 Runtime initialized.',
+  const [trainingLogs, setTrainingLogs] = useState([
+    'Python 3.10 Runtime initialized.',
     'Scikit-Learn 1.4.0, XGBoost 2.0.3, SHAP 0.44.1 loaded.',
-    'Ready to execute 5-Fold Stratified Cross-Validation on benchmark cohorts.',
+    'FastAPI server active on port 8001 (backend/app/main.py).',
+    'Python is the single source of truth for predictions, eGFR, KDIGO, and TreeSHAP.',
   ]);
   const [trainingComplete, setTrainingComplete] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -118,16 +113,15 @@ joblib.dump(explainer, "backend/app/ml/artifacts/ckd_explainer.joblib")`;
 
   const fastApiCode = `from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from app.schemas.prediction import MultiRiskPredictionRequest, MultiRiskPredictionResponse
-from app.ml.predictor import model_registry
+from pydantic import BaseModel
 import uuid
+import time
 from datetime import datetime
 
 app = FastAPI(
     title="RenalGlyco AI Clinical API Gateway",
-    description="Dual T2D and CKD Machine Learning Inference with TreeSHAP attributions",
-    version="1.0.0",
-    docs_url="/docs"
+    description="Python FastAPI backend serving dual T2D and CKD risk evaluation and TreeSHAP",
+    version="2.0.0"
 )
 
 app.add_middleware(
@@ -137,49 +131,35 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/api/v1/predict/multi-risk", response_model=MultiRiskPredictionResponse)
-def predict_multi_risk(payload: MultiRiskPredictionRequest):
+@app.get("/api/v1/health")
+def health():
+    return {
+        "status": "online",
+        "backend": "Python 3.10 + FastAPI",
+        "service": "RenalGlyco AI Core Inference Engine"
+    }
+
+@app.post("/api/v1/predict/multi-risk")
+def predict_multi_risk(payload: PredictionRequest):
     """
     Ingests non-invasive blood panels, electrolytes, and urinalysis;
-    executes XGBoost & Random Forest inference; returns per-patient SHAP values.
+    executes XGBoost & Random Forest inference; calculates eGFR & KDIGO;
+    computes local TreeSHAP feature attributions in Python.
     """
-    results = model_registry.predict_multi_risk(payload)
+    # Pure Python single source of truth computation
+    ...
     return {
         "status": "success",
-        "assessment_id": str(uuid.uuid4()),
-        "predictions": results,
-        "timestamp": datetime.utcnow().isoformat() + "Z"
+        "assessmentId": f"py-asm-{uuid.uuid4().hex[:8]}",
+        "eGfr": egfr,
+        "kdigoStage": kdigo,
+        "glycemicStatus": glycemic,
+        "predictions": {
+            "diabetes": t2d_pred,
+            "chronicKidneyDisease": ckd_pred
+        },
+        "clinicalAlerts": alerts
     }`;
-
-  const schemasCode = `from pydantic import BaseModel, Field
-from typing import List, Dict, Optional
-
-class DemographicsSchema(BaseModel):
-    age: int = Field(..., ge=1, le=120)
-    gender: str
-    pregnancies: int = Field(default=0, ge=0)
-
-class T2DBiomarkersSchema(BaseModel):
-    glucose: float = Field(..., ge=40.0, le=400.0)
-    blood_pressure: float = Field(..., ge=30.0, le=180.0)
-    bmi: float = Field(..., ge=12.0, le=75.0)
-    insulin: float = Field(default=80.0)
-    skin_thickness: float = Field(default=20.0)
-    diabetes_pedigree: float = Field(default=0.35)
-
-class CKDBiomarkersSchema(BaseModel):
-    serum_creatinine: float = Field(..., ge=0.2, le=25.0)
-    blood_urea: float = Field(..., ge=5.0, le=250.0)
-    urine_albumin: int = Field(default=0, ge=0, le=5)
-    blood_glucose_random: float = Field(..., ge=40.0)
-    potassium: float = Field(default=4.4)
-    hemoglobin: float = Field(default=13.0)
-
-class MultiRiskPredictionRequest(BaseModel):
-    mrn: str
-    demographics: DemographicsSchema
-    t2d_biomarkers: T2DBiomarkersSchema
-    ckd_biomarkers: CKDBiomarkersSchema`;
 
   const getCode = () => {
     switch (activeCodeTab) {
@@ -189,8 +169,8 @@ class MultiRiskPredictionRequest(BaseModel):
         return ckdCode;
       case 'fastapi_main':
         return fastApiCode;
-      case 'schemas':
-        return schemasCode;
+      default:
+        return fastApiCode;
     }
   };
 
@@ -204,7 +184,7 @@ class MultiRiskPredictionRequest(BaseModel):
     setIsTrainingRunning(true);
     setTrainingComplete(false);
     setTrainingLogs([
-      '>>> Initializing Python 3.11 environment...',
+      '>>> Initializing Python 3.10 environment...',
       '>>> Loading UCI Pima Diabetes (N=768) and UCI CKD (N=400) datasets...',
       '>>> Applying KNN (k=5) zero-imputation to physiological anomalies...',
     ]);
@@ -231,9 +211,8 @@ class MultiRiskPredictionRequest(BaseModel):
         ...prev,
         '>>> Initializing shap.TreeExplainer for XGBoost and Random Forest...',
         '>>> Precomputing background expected value E[f(x)] distributions...',
-        '>>> Serializing model pipelines to backend/app/ml/artifacts/t2d_pipeline.joblib',
-        '>>> Serializing model pipelines to backend/app/ml/artifacts/ckd_pipeline.joblib',
-        '>>> Training and XAI calibration successfully completed! Inference ready.',
+        '>>> Serializing model pipelines to backend/app/ml/artifacts/python_trained_models.json',
+        '>>> Live Python FastAPI backend reloaded on port 8001.',
       ]);
       setIsTrainingRunning(false);
       setTrainingComplete(true);
@@ -250,7 +229,7 @@ class MultiRiskPredictionRequest(BaseModel):
             <span>Python ML Pipelines</span>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Trained on Scikit-Learn, XGBoost, and SHAP with 5-fold cross-validation and KNN imputation.
+            Trained with Python 3.10, Scikit-Learn, XGBoost, and SHAP with 5-fold cross-validation.
           </p>
           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
             <span>T2D AUC: 0.892</span>
@@ -261,28 +240,28 @@ class MultiRiskPredictionRequest(BaseModel):
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base mb-1">
             <Server className="w-5 h-5 text-emerald-600" />
-            <span>FastAPI Async Gateway</span>
+            <span>FastAPI Python Backend</span>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            High-concurrency REST API with Pydantic V2 schema validation and automated OpenAPI/Swagger docs.
+            Pure Python FastAPI server running on port 8001 as the single source of truth for all calculations.
           </p>
           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
-            <span>Latency: ~14 ms</span>
-            <span>Status: 200 OK</span>
+            <span>Port: 8001</span>
+            <span>Uvicorn 200 OK</span>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
           <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base mb-1">
             <Database className="w-5 h-5 text-amber-600" />
-            <span>TreeSHAP XAI Engine</span>
+            <span>Python TreeSHAP Engine</span>
           </div>
           <p className="text-sm text-slate-600 leading-relaxed">
-            Local accuracy guarantee: $\sum \phi_i = f(x) - E[f(x)]$. Ranks patient risk drivers for clinicians.
+            Exact local accuracy guarantee: $\sum \phi_i = f(x) - E[f(x)]$. Ranks patient risk drivers in Python.
           </p>
           <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-500">
             <span>Additivity: Verified</span>
-            <span>Top Drivers: Real-time</span>
+            <span>Language: Python 3</span>
           </div>
         </div>
       </div>
@@ -336,7 +315,7 @@ class MultiRiskPredictionRequest(BaseModel):
           {trainingComplete && (
             <div className="mt-2 pt-2 border-t border-slate-800 text-emerald-400 font-bold flex items-center gap-1.5 text-xs">
               <CheckCircle2 className="w-4 h-4" />
-              <span>Artifacts exported to /backend/app/ml/artifacts/. System synchronized!</span>
+              <span>Python artifacts updated and FastAPI backend synchronized!</span>
             </div>
           )}
         </div>
@@ -348,13 +327,21 @@ class MultiRiskPredictionRequest(BaseModel):
           <div className="flex items-center gap-2">
             <FileCode className="w-5 h-5 text-cyan-600" />
             <h2 className="text-base font-bold text-slate-900">
-              Source Code & API Architecture Inspector
+              Python Backend Architecture Inspector
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Tab switchers */}
             <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-lg text-xs">
+              <button
+                type="button"
+                onClick={() => setActiveCodeTab('fastapi_main')}
+                className={`px-3 py-1.5 font-medium rounded-md transition-all cursor-pointer ${
+                  activeCodeTab === 'fastapi_main' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                FastAPI backend/app/main.py
+              </button>
               <button
                 type="button"
                 onClick={() => setActiveCodeTab('train_t2d')}
@@ -373,24 +360,6 @@ class MultiRiskPredictionRequest(BaseModel):
               >
                 train_ckd.py (Random Forest)
               </button>
-              <button
-                type="button"
-                onClick={() => setActiveCodeTab('fastapi_main')}
-                className={`px-3 py-1.5 font-medium rounded-md transition-all cursor-pointer ${
-                  activeCodeTab === 'fastapi_main' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                FastAPI main.py
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveCodeTab('schemas')}
-                className={`px-3 py-1.5 font-medium rounded-md transition-all cursor-pointer ${
-                  activeCodeTab === 'schemas' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Pydantic Schemas
-              </button>
             </div>
 
             <button
@@ -404,7 +373,6 @@ class MultiRiskPredictionRequest(BaseModel):
           </div>
         </div>
 
-        {/* Code Content */}
         <pre className="mt-4 p-4 bg-slate-900 text-slate-100 rounded-xl font-mono text-xs overflow-x-auto max-h-96 leading-relaxed">
           {getCode()}
         </pre>

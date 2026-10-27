@@ -1,5 +1,5 @@
 {
-  "summary":  "Comprehensive 10-Phase End-to-End Implementation Plan for RenalGlyco AI, detailing project analysis, tech stack feasibility, system architecture with Mermaid diagrams, data & ML engineering, DB and API design, repository structure, step-by-step roadmap, testing, deployment, and final delivery mapping.",
-  "updatedAt":  "2026-10-26T16:03:29.096368639Z",
+  "summary":  "Updated architecture plan documenting the complete migration to React JavaScript (JSX) on Vite for the frontend and pure Python FastAPI for the backend. All TypeScript files and Node.js/Express backend files have been removed. Python is now the single source of truth for all clinical predictions, eGFR calculation, KDIGO staging, and TreeSHAP attributions.",
+  "updatedAt":  "2026-10-27T14:09:45.673593410Z",
   "userFacing":  true
 }

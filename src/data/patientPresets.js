@@ -2,18 +2,7 @@
  * Clinical patient presets representing classic diagnostic phenotypes and edge cases.
  */
 
-import { ClinicalPatientRecord, HistoricalVisit } from '../types/clinical';
-
-export interface PatientPreset {
-  id: string;
-  name: string;
-  badge: string;
-  description: string;
-  record: ClinicalPatientRecord;
-  history: HistoricalVisit[];
-}
-
-export const CLINICAL_PRESETS: PatientPreset[] = [
+export const CLINICAL_PRESETS = [
   {
     id: 'silent-nephropathy',
     name: 'Silent Diabetic Nephropathy (Early Synergistic)',

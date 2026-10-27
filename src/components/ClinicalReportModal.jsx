@@ -1,28 +1,20 @@
 import React from 'react';
-import { ClinicalPatientRecord, MultiRiskPredictionResponse } from '../types/clinical';
 import { FileText, X, Printer } from 'lucide-react';
 
-interface ClinicalReportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  record: ClinicalPatientRecord;
-  prediction: MultiRiskPredictionResponse;
-}
-
-export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
+export const ClinicalReportModal = ({
   isOpen,
   onClose,
   record,
   prediction,
 }) => {
-  if (!isOpen) return null;
+  if (!isOpen || !prediction) return null;
 
   const handlePrint = () => {
     window.print();
   };
 
-  const t2d = prediction.predictions.diabetes;
-  const ckd = prediction.predictions.chronicKidneyDisease;
+  const t2d = prediction.predictions?.diabetes || {};
+  const ckd = prediction.predictions?.chronicKidneyDisease || {};
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
@@ -32,7 +24,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-slate-700" />
             <span className="text-sm font-semibold text-slate-900">
-              Clinical Decision Support Summary
+              Clinical Decision Support Summary (Python Engine)
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -63,7 +55,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
                 RenalGlyco AI Clinical Consultation Report
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Dual Cardiorenal Metabolic & Nephropathic Risk Assessment System
+                Dual Cardiorenal Metabolic & Nephropathic Risk Assessment System (FastAPI Backend)
               </p>
             </div>
             <div className="text-right font-mono text-[11px] text-slate-500">
@@ -76,22 +68,22 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
             <div>
               <span className="text-slate-400 block text-[10px] uppercase font-semibold">Patient Name</span>
-              <span className="font-semibold text-slate-900 text-sm">{record.demographics.name}</span>
+              <span className="font-semibold text-slate-900 text-sm">{record.demographics?.name || 'Patient'}</span>
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] uppercase font-semibold">Medical Record No.</span>
-              <span className="font-mono font-bold text-slate-900">{record.demographics.mrn}</span>
+              <span className="font-mono font-bold text-slate-900">{record.demographics?.mrn}</span>
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] uppercase font-semibold">Age / Sex</span>
               <span className="text-slate-900 font-medium">
-                {record.demographics.age} yrs · {record.demographics.gender}
+                {record.demographics?.age} yrs · {record.demographics?.gender}
               </span>
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] uppercase font-semibold">BMI / Blood Pressure</span>
               <span className="font-mono text-slate-900">
-                {record.glycemic.bmi} kg/m² · {record.renal.bloodPressureSystolic}/{record.renal.bloodPressureDiastolic}
+                {record.glycemic?.bmi} kg/m² · {record.renal?.bloodPressureSystolic}/{record.renal?.bloodPressureDiastolic}
               </span>
             </div>
           </div>
@@ -100,12 +92,12 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 border border-slate-200 rounded-xl">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Metabolic Surveillance
+                Metabolic Surveillance (Python XGBoost)
               </span>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-lg font-bold text-slate-900">Type 2 Diabetes Risk</span>
                 <span className="text-lg font-mono font-bold text-amber-600">
-                  {Math.round(t2d.riskProbability * 100)}%
+                  {Math.round((t2d.riskProbability || 0) * 100)}%
                 </span>
               </div>
               <div className="text-xs text-slate-600 mt-1">
@@ -115,12 +107,12 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
 
             <div className="p-4 border border-slate-200 rounded-xl">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                Renal Filtration Surveillance
+                Renal Filtration Surveillance (Python Random Forest)
               </span>
               <div className="flex items-baseline justify-between mt-1">
                 <span className="text-lg font-bold text-slate-900">Chronic Kidney Disease</span>
                 <span className="text-lg font-mono font-bold text-cyan-600">
-                  {Math.round(ckd.riskProbability * 100)}%
+                  {Math.round((ckd.riskProbability || 0) * 100)}%
                 </span>
               </div>
               <div className="text-xs text-slate-600 mt-1">
@@ -132,13 +124,13 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
           {/* Explainable AI Audit Summary */}
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-2">
-              Explainable AI (TreeSHAP) Primary Biological Drivers
+              Explainable AI (Python TreeSHAP) Primary Biological Drivers
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <span className="font-semibold text-slate-900 block mb-1">T2D Escalating Drivers:</span>
                 <ul className="space-y-1 font-mono text-[11px] text-slate-700">
-                  {t2d.topRiskDrivers.slice(0, 3).map((d) => (
+                  {(t2d.topRiskDrivers || []).slice(0, 3).map((d) => (
                     <li key={d.feature} className="flex justify-between">
                       <span>{d.clinicalName} ({d.value} {d.unit}):</span>
                       <span className="text-rose-600 font-semibold">+{d.shapImpact.toFixed(3)}</span>
@@ -150,7 +142,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
               <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <span className="font-semibold text-slate-900 block mb-1">CKD Escalating Drivers:</span>
                 <ul className="space-y-1 font-mono text-[11px] text-slate-700">
-                  {ckd.topRiskDrivers.slice(0, 3).map((d) => (
+                  {(ckd.topRiskDrivers || []).slice(0, 3).map((d) => (
                     <li key={d.feature} className="flex justify-between">
                       <span>{d.clinicalName} ({d.value} {d.unit}):</span>
                       <span className="text-cyan-700 font-semibold">+{d.shapImpact.toFixed(3)}</span>
@@ -167,7 +159,7 @@ export const ClinicalReportModal: React.FC<ClinicalReportModalProps> = ({
               Automated Clinical Recommendations (ADA & KDIGO 2024 Guidelines)
             </h3>
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs text-slate-700">
-              {prediction.clinicalAlerts.map((alert, i) => (
+              {(prediction.clinicalAlerts || []).map((alert, i) => (
                 <div key={i} className="flex items-start gap-1.5">
                   <span className="text-slate-400">·</span>
                   <span>{alert}</span>

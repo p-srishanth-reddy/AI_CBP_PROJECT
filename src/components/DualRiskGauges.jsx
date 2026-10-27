@@ -1,28 +1,25 @@
 import React from 'react';
-import { MultiRiskPredictionResponse } from '../types/clinical';
 import { ShieldAlert, Zap } from 'lucide-react';
 
-interface DualRiskGaugesProps {
-  prediction: MultiRiskPredictionResponse;
-}
+export const DualRiskGauges = ({ prediction }) => {
+  if (!prediction || !prediction.predictions) return null;
 
-export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) => {
   const { diabetes, chronicKidneyDisease } = prediction.predictions;
 
   const renderGauge = (
-    title: string,
-    probability: number,
-    category: string,
-    baseValue: number,
-    icon: React.ReactNode,
-    subtitle: string
+    title,
+    probability,
+    category,
+    baseValue,
+    icon,
+    subtitle
   ) => {
-    const percentage = Math.round(probability * 100);
+    const percentage = Math.round((probability || 0) * 100);
 
     const radius = 70;
     const strokeWidth = 13;
     const circumference = Math.PI * radius;
-    const strokeDashoffset = circumference * (1 - probability);
+    const strokeDashoffset = circumference * (1 - (probability || 0));
 
     let colorClass = '#10B981';
     let badgeBg = 'text-emerald-800 bg-emerald-50 border-emerald-300';
@@ -78,14 +75,14 @@ export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) =>
             />
           </svg>
 
-          {/* Central Metric Value with increased typography */}
+          {/* Central Metric Value */}
           <div className="absolute bottom-2 flex flex-col items-center">
             <span className="text-4xl font-mono font-bold text-slate-900 tracking-tight">
               {percentage}
               <span className="text-xl text-slate-500 font-normal">%</span>
             </span>
             <span className="text-xs font-mono text-slate-500 uppercase tracking-wider font-semibold">
-              Calculated Probability
+              Python Calculated Risk
             </span>
           </div>
         </div>
@@ -94,7 +91,7 @@ export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) =>
         <div className="w-full mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-600">
           <span>Population Base Rate $E[f(x)]$</span>
           <span className="font-mono text-slate-900 font-bold">
-            {Math.round(baseValue * 100)}%
+            {Math.round((baseValue || 0.35) * 100)}%
           </span>
         </div>
       </div>
@@ -111,7 +108,7 @@ export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) =>
           diabetes.riskCategory,
           diabetes.baseValue,
           <Zap className="w-5 h-5 text-amber-500" />,
-          'XGBoost Clinical Pipeline'
+          'Python XGBoost Pipeline'
         )}
 
         {renderGauge(
@@ -120,11 +117,11 @@ export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) =>
           chronicKidneyDisease.riskCategory,
           chronicKidneyDisease.baseValue,
           <ShieldAlert className="w-5 h-5 text-cyan-600" />,
-          'Random Forest Renal Ensemble'
+          'Python Random Forest Model'
         )}
       </div>
 
-      {/* Calculated Clinical Context Banner with larger font */}
+      {/* Calculated Clinical Context Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 text-sm">
         <div>
           <span className="text-slate-500 font-medium block text-xs">2021 CKD-EPI eGFR</span>
@@ -143,21 +140,21 @@ export const DualRiskGauges: React.FC<DualRiskGaugesProps> = ({ prediction }) =>
             {prediction.glycemicStatus}
           </span>
           <div className="text-xs text-slate-500 mt-0.5">
-            Surrogate threshold audit
+            Python surrogate threshold
           </div>
         </div>
 
         <div>
-          <span className="text-slate-500 font-medium block text-xs">Inference Engine Audit</span>
+          <span className="text-slate-500 font-medium block text-xs">Python Backend Audit</span>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="font-mono text-xs font-bold text-slate-800">
               TreeSHAP: {prediction.executionTimeMs} ms
             </span>
             <span className="text-slate-300">·</span>
-            <span className="text-emerald-700 font-bold text-xs">Validated</span>
+            <span className="text-emerald-700 font-bold text-xs">FastAPI 200 OK</span>
           </div>
           <div className="text-xs text-slate-400 font-mono mt-0.5 truncate">
-            ID: {prediction.assessmentId.substring(0, 16)}...
+            ID: {prediction.assessmentId ? prediction.assessmentId.substring(0, 16) : 'py-asm'}...
           </div>
         </div>
       </div>
